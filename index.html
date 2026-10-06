@@ -49,14 +49,12 @@ label{display:flex;gap:8px;align-items:center}
 <script>
 const SEG='abcdefg',R={a:[0,0,60,10],f:[0,0,10,50],b:[50,0,10,50],g:[0,45,60,10],e:[0,50,10,50],c:[50,50,10,50],d:[0,90,60,10]};
 const M=s=>[...s].reduce((x,c)=>x|1<<SEG.indexOf(c),0);
-const TYPES=[['橫上','a',9],['橫中','g',9],['直上','b',9],['直下','c',9],
-['右','bc',2],['「','af',2],['┐','ab',2],['二','ad',2],['丁','ag',2],['⌐','fg',2],['¬','bg',2],['雙上','bf',2],['斜一','be',1],['斜二','cf',1],
-['ㄏ','abc',1],['┘','bcd',1],['三','adg',1],['ト','efg',1],['u','cde',1],['n','ceg',1]].map(([n,s,k])=>({n,m:M(s),k})); // 1畫36張(60%)、2畫18張(30%)、3畫6張(10%)；k=張數
+const TYPES=[['a',12],['b',14],['g',10],['ab',8],['ac',8],['bc',6],['ad',4],['be',8],['ce',8],['ag',9],['bg',9],['abc',2],['abd',3],['abe',2],['ace',2],['bce',2],['cde',2],['abg',2],['acg',2],['bcg',2],['adg',1],['beg',2],['ceg',2]].map(([s,k])=>({n:s.length+'畫',m:M(s),k})); // 1畫36張(30%)、2畫60張(50%)、3畫24張(20%)，共120張；透明卡牌可旋轉/翻面，等價的形狀合併為同一種
 const DIG={0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
 const D2={};for(const k in DIG)D2[M(DIG[k])]=+k;
 const FULL=127,pc=m=>m.toString(2).replace(/0/g,'').length;
 const rot=m=>{let r=m&64;[[0,3],[1,4],[2,5],[3,0],[4,1],[5,2]].forEach(([a,b])=>{if(m>>a&1)r|=1<<b});return r}; // 旋轉 180°：a↔d, b↔e, c↔f
-const em=(c,r=c.rot)=>r?rot(c.m):c.m,vw=(m,f)=>f?rot(m):m; // vw：把牌堆換成某側玩家看到的樣子
+const hm=m=>m&73|(m>>1&1)<<5|(m>>5&1)<<1|(m>>2&1)<<4|(m>>4&1)<<2,vm=m=>m&64|(m&1)<<3|(m>>3&1)|(m>>1&1)<<2|(m>>2&1)<<1|(m>>4&1)<<5|(m>>5&1)<<4,TF=[m=>m,rot,hm,vm],ors=m=>[0,1,2,3].filter((r,i,a)=>a.findIndex(q=>TF[q](m)===TF[r](m))===i),ORI=m=>ors(m).map(r=>TF[r](m)),em=(c,r=c.rot)=>TF[r](c.m),vw=(m,f)=>f?rot(m):m; // vw：把牌堆換成某側玩家看到的樣子
 const svg=(m,col='var(--ink)',own=m)=>{const rs=s=>{const r=R[s];return `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`},L=f=>[...SEG].filter((_,i)=>f>>i&1).map(rs).join('');return `<svg viewBox="0 0 60 100" preserveAspectRatio="none" shape-rendering="crispEdges"><g fill="var(--mut)" opacity=".13">${[...SEG].map(rs).join('')}</g><g fill="${col}">${L(m&own)}</g><g fill="${col}" opacity=".5">${L(m&~own)}</g></svg>`};
 let G,$=document.getElementById('app');
 const P=()=>G.players[G.cur];
@@ -68,9 +66,9 @@ function resP(c,i,r=c.rot){ // i=-1：開新牌堆。回傳的 m 是「目前玩
  return{m,pts:D2[m]??0,dig:D2[m]};
 }
 const targets=(c,r=c.rot)=>{const t=[];for(let i=-1;i<G.piles.length;i++)if(resP(c,i,r))t.push(i);return t};
-const stuck=p=>!p.hand.some(c=>[0,1].some(r=>targets(c,r).length));
+const stuck=p=>!p.hand.some(c=>ors(c.m).some(r=>targets(c,r).length));
 function discardSel(){if(G.sel===null||G.phase!=='play'||lock())return;const k=G.sel;G.sel=null;discard(k)}
-function rotSel(){if(G.sel===null)return;const c=P().hand[G.sel];c.rot^=1;render()}
+function rotSel(){if(G.sel===null)return;const c=P().hand[G.sel];{const o=ors(c.m);c.rot=o[(o.indexOf(c.rot)+1)%o.length]}render()}
 const FB_CONFIG={ // Firebase 設定（使用 Realtime Database）
  apiKey:"AIzaSyC1m14JDvWw6RXJaXxB4IITMWHm1kDqMKM",
  authDomain:"segment-stack.firebaseapp.com",
@@ -94,7 +92,7 @@ const fsOn=()=>document.fullscreenElement||document.webkitFullscreenElement;
 function fs(on){const d=document.documentElement;try{if(on===undefined)on=!fsOn();let r;if(on&&!fsOn())r=(d.requestFullscreen||d.webkitRequestFullscreen).call(d);else if(!on&&fsOn())r=(document.exitFullscreen||document.webkitExitFullscreen).call(document);if(r&&r.catch)r.catch(()=>{})}catch(e){}}
 function modal(h){let d=document.getElementById('md');if(!d){d=document.createElement('div');d.id='md';d.className='ov';d.style.zIndex=20;document.body.appendChild(d)}d.innerHTML=h+'<button class="b g" onclick="document.getElementById(\'md\').remove()">關閉</button>'}
 function settings(){modal(`<h1>設定</h1><label>🎵 音樂 <input type="range" min="0" max="100" value="${S.mus*100}" oninput="S.mus=this.value/100;sv();for(const k in BG)BG[k].volume=S.mus"></label><label>🔔 音效 <input type="range" min="0" max="100" value="${S.sfx*100}" oninput="S.sfx=this.value/100;sv()" onchange="sfx.place()"></label><button class="b" onclick="fs()">⛶ 全螢幕 開／關</button>`)}
-const rulesHTML=()=>`<div class="table" style="text-align:left;line-height:1.8"><b>規則</b><br>每人 5 張手牌（共 22 種紋路、60 張：1 畫 60%、2 畫 30%、3 畫 10%），每張牌放置前都可<b>旋轉 180°</b>（上下左右對調）。每回合<b>必須出 1 張</b>：開一個新牌堆（桌上最多 5 堆），或疊在既有牌堆上。疊牌時<b>已有線的位置不能重疊</b>，只能把有線蓋在無線處，紋路取聯集。<br><b>得分以出牌玩家的視角為準</b>：玩家 1、3 坐▲側，玩家 2、4 坐▼側，兩側看同一堆牌是上下顛倒的，所以我方看到 9，對方看到的就是 6，誰疊出來就用誰看到的數字計分（畫面顯示的是目前玩家的視角）。<br>疊完後若牌堆圖形剛好是 0~9，就得該數字分數（0 不得分）；同一堆繼續疊出新數字可再得分。牌堆疊成 8 就不能再疊，整堆回到抽牌堆並洗牌。<br><b>只要成功出牌就能抽 1 張</b>（組成 0 時多抽 1 張，共 2 張）；<b>丟棄牌則不能抽牌</b>。抽牌時可選<b>抽牌堆</b>或<b>棄牌堆最上面一張</b>；抽牌堆用盡時，棄牌堆會全部洗牌放回抽牌堆。你也可以選擇不出牌、改丟一張到明擺的棄牌堆；若手牌完全無法出，則一定要丟。<br>有人達到目標分數時遊戲結束；選「不限」則要等所有人手牌用完才結束（可能很久）。</div>`;
+const rulesHTML=()=>`<div class="table" style="text-align:left;line-height:1.8"><b>規則</b><br>每人 5 張手牌（共 23 種紋路、120 張：1 畫 30%、2 畫 50%、3 畫 20%）。因為是透明卡牌，放置前可按「變換」<b>旋轉或翻面</b>（上下、左右翻轉都可以）。每回合<b>必須出 1 張</b>：開一個新牌堆（桌上最多 5 堆），或疊在既有牌堆上。疊牌時<b>已有線的位置不能重疊</b>，只能把有線蓋在無線處，紋路取聯集。<br><b>得分以出牌玩家的視角為準</b>：玩家 1、3 坐▲側，玩家 2、4 坐▼側，兩側看同一堆牌是上下顛倒的，所以我方看到 9，對方看到的就是 6，誰疊出來就用誰看到的數字計分（畫面顯示的是目前玩家的視角）。<br>疊完後若牌堆圖形剛好是 0~9，就得該數字分數（0 不得分）；同一堆繼續疊出新數字可再得分。牌堆疊成 8 就不能再疊，整堆回到抽牌堆並洗牌。<br><b>只要成功出牌就能抽 1 張</b>（組成 0 時多抽 1 張，共 2 張）；<b>丟棄牌則不能抽牌</b>。抽牌時可選<b>抽牌堆</b>或<b>棄牌堆最上面一張</b>；抽牌堆用盡時，棄牌堆會全部洗牌放回抽牌堆。你也可以選擇不出牌、改丟一張到明擺的棄牌堆；若手牌完全無法出，則一定要丟。<br>有人達到目標分數時遊戲結束；選「不限」則要等所有人手牌用完才結束（可能很久）。</div>`;
 function rules(){modal('<div style="max-height:75vh;overflow:auto;max-width:600px">'+rulesHTML()+'</div>')}
 function splash(){G=null;$.className='';$.innerHTML=`<div class="ov" onclick="enter()" style="cursor:pointer"><h1 style="font-size:36px">疊紋拼數</h1><div class="pulse">點擊畫面開始</div></div>`}
 function enter(){fs(true);bgm('lobby');lobby()}
@@ -158,7 +156,7 @@ function render(){
  <div><div class="disc">${dh||'<span style="color:var(--mut);font-size:12px">（空）</span>'}</div><small style="color:var(--mut)">棄牌堆（明擺）${G.disc.length}</small></div></div>
  ${G.phase==='draw'&&!lk?`<div class="row" style="justify-content:center;margin-top:12px"><button class="b" ${G.deck.length?'':'disabled'} onclick="takeDraw('deck')">抽牌堆</button><button class="b" ${top?'':'disabled'} onclick="takeDraw('disc')">拿棄牌堆頂${top?`<span class="mini top" style="width:26px;height:43px">${svg(vw(top.m,RF))}</span>`:''}</button></div>`:''}</div>
  <div class="hand">${lk?p.hand.map(()=>'<div class="c"></div>').join(''):p.hand.map((c,i)=>`<div class="w" onclick="pick(${i})"><div class="c ${G.sel===i?'sel':''} ${st?'dis':''}">${svg(vw(em(c),RF))}</div><small>${c.n}${c.rot?' ↻':''}</small></div>`).join('')}</div>
- ${sc?'<div class="row" style="justify-content:center;margin-top:10px"><button class="b" onclick="rotSel()">↻ 旋轉 180°</button><button class="b g" onclick="discardSel()">丟棄這張</button></div>':''}
+ ${sc?'<div class="row" style="justify-content:center;margin-top:10px"><button class="b" onclick="rotSel()"'+(ors(sc.m).length>1?'':' disabled')+'>變換</button><button class="b g" onclick="discardSel()">丟棄這張</button></div>':''}
  <div id="log">${G.log.slice(-5).reverse().join('<br>')}</div>`;
 }
 function pick(i){
@@ -192,7 +190,7 @@ function takeDraw(src){
 }
 function cpuDraw(){
  const top=G.disc[G.disc.length-1];
- const want=G.level&&top&&[0,1].some(r=>targets(top,r).some(i=>resP(top,i,r).dig!==undefined));
+ const want=G.level&&top&&ors(top.m).some(r=>targets(top,r).some(i=>resP(top,i,r).dig!==undefined));
  takeDraw(want||!G.deck.length?'disc':'deck');
 }
 function advance(){
@@ -204,8 +202,8 @@ function advance(){
 }
 function cpu(){
  const L=G.level,h=P().hand;let best=null,bv=-1e9;const cv=h.map(()=>-1e9);
- h.forEach((c,k)=>[0,1].forEach(rt=>targets(c,rt).forEach(i=>{const r=resP(c,i,rt);
-  const nf=((G.cur+1)%G.players.length)%2^P().flip,om=vw(r.m,nf),tt=TYPES.map(t=>[t.m,rot(t.m)].map(x=>!(x&om)&&D2[x|om]!==undefined?D2[x|om]:-1)),risk=r.m===FULL?0:L>1?tt.reduce((s,a,j)=>s+TYPES[j].k*Math.max(0,...a),0)/20:L?tt.filter(a=>Math.max(...a)>=0).length*.6:0; // 對手下一張能得分的牌種數
+ h.forEach((c,k)=>ors(c.m).forEach(rt=>targets(c,rt).forEach(i=>{const r=resP(c,i,rt);
+  const nf=((G.cur+1)%G.players.length)%2^P().flip,om=vw(r.m,nf),tt=TYPES.map(t=>ORI(t.m).map(x=>!(x&om)&&D2[x|om]!==undefined?D2[x|om]:-1)),risk=r.m===FULL?0:L>1?tt.reduce((s,a,j)=>s+TYPES[j].k*Math.max(0,...a),0)/20:L?tt.filter(a=>Math.max(...a)>=0).length*.6:0; // 對手下一張能得分的牌種數
   const v=r.pts*3+(r.dig===undefined?0:r.dig===0?4:1.5)-risk+Math.random()*[12,.5,.15][L];
   if(v>cv[k])cv[k]=v;if(v>bv){bv=v;best=[i,k,rt]}})));
  if(best&&(L<1||bv>(L>1?-3:-1.5))){h[best[1]].rot=best[2];place(best[0],best[1])} // 出牌太危險就改丟牌
