@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>疊紋拼數</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4efe6;--fg:#2b2620;--card:#fffdf8;--ink:#c8402f;--mut:#8a7f70;--acc:#2f6f5e;--line:#d8cfbf}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b18;--fg:#efe8da;--card:#2a2723;--ink:#ff7a5f;--mut:#9a9082;--acc:#5fb59d;--line:#433e37}}
+:root[data-theme="dark"]{--bg:#1d1b18;--fg:#efe8da;--card:#2a2723;--ink:#ff7a5f;--mut:#9a9082;--acc:#5fb59d;--line:#433e37}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans TC","PingFang TC",sans-serif}
+body{max-width:760px;margin:0 auto;padding:12px}
+h1{font-size:20px;margin:4px 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pl{flex:1;min-width:90px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--card);font-size:13px}
+.pl.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.pl b{font-size:18px;color:var(--ink)}
+.table{margin:12px 0;border:1px dashed var(--line);border-radius:12px;padding:10px;text-align:center}
+.piles{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.pile{width:78px;font-size:12px;color:var(--mut)}
+.pile .pc{height:130px;border:2px solid var(--line);border-radius:6px;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px}
+.pile.t{cursor:pointer}.pile.s .pc{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.pile b{color:var(--acc);display:block;font-size:14px}
+.mini{width:30px;height:50px;border:1.5px solid var(--line);border-radius:3px;overflow:hidden;background:var(--card);flex:none}
+.mini.top{width:42px;height:70px;border-color:var(--ink)}
+.disc{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;align-items:flex-end;min-height:30px;margin-top:6px}
+.back{width:42px;height:70px;border-radius:5px;background:repeating-linear-gradient(45deg,var(--line),var(--line) 4px,var(--card) 4px,var(--card) 8px);border:1.5px solid var(--mut)}
+.hand{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.c{width:64px;height:107px;border:2px solid var(--line);border-radius:6px;background:var(--card);overflow:hidden;box-sizing:border-box;transition:transform .12s}
+.w{cursor:pointer}.w small{display:block;font-size:11px;color:var(--mut);text-align:center;margin-top:3px}
+.c.sel{transform:translateY(-12px);border-color:var(--acc)}
+.c.dis{border-color:var(--ink)}
+svg{display:block;width:100%;height:100%}
+button.b{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+button.b.g{background:transparent;color:var(--fg);border:1px solid var(--line)}
+button.b:disabled{opacity:.35;cursor:default}
+#log{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.6}
+.ov{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;z-index:9}
+
+select,input[type=text]{font:inherit;padding:4px 6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+label{display:flex;gap:8px;align-items:center}
+.menu{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.card{flex:1;min-width:210px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card);display:flex;flex-direction:column;gap:8px;align-items:center}
+.card h3{margin:0}
+#app{transition:transform .6s}#app.rt{transform:rotate(180deg)}
+.pulse{animation:p 1.4s infinite;color:var(--mut)}@keyframes p{50%{opacity:.25}}
+.fl .pc{animation:fl .6s}@keyframes fl{from{transform:rotate(180deg)}}
+</style></head><body>
+<h1>疊紋拼數</h1>
+<div id="app"></div>
+<script>
+const SEG='abcdefg',R={a:[0,0,60,10],f:[0,0,10,50],b:[50,0,10,50],g:[0,45,60,10],e:[0,50,10,50],c:[50,50,10,50],d:[0,90,60,10]};
+const M=s=>[...s].reduce((x,c)=>x|1<<SEG.indexOf(c),0);
+const TYPES=[['橫上','a',9],['橫中','g',9],['直上','b',9],['直下','c',9],
+['右','bc',2],['「','af',2],['┐','ab',2],['二','ad',2],['丁','ag',2],['⌐','fg',2],['¬','bg',2],['雙上','bf',2],['斜一','be',1],['斜二','cf',1],
+['ㄏ','abc',1],['┘','bcd',1],['三','adg',1],['ト','efg',1],['u','cde',1],['n','ceg',1]].map(([n,s,k])=>({n,m:M(s),k})); // 1畫36張(60%)、2畫18張(30%)、3畫6張(10%)；k=張數
+const DIG={0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
+const D2={};for(const k in DIG)D2[M(DIG[k])]=+k;
+const FULL=127,pc=m=>m.toString(2).replace(/0/g,'').length;
+const rot=m=>{let r=m&64;[[0,3],[1,4],[2,5],[3,0],[4,1],[5,2]].forEach(([a,b])=>{if(m>>a&1)r|=1<<b});return r}; // 旋轉 180°：a↔d, b↔e, c↔f
+const em=(c,r=c.rot)=>r?rot(c.m):c.m,vw=(m,f)=>f?rot(m):m; // vw：把牌堆換成某側玩家看到的樣子
+const svg=(m,col='var(--ink)',own=m)=>{const rs=s=>{const r=R[s];return `<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`},L=f=>[...SEG].filter((_,i)=>f>>i&1).map(rs).join('');return `<svg viewBox="0 0 60 100" preserveAspectRatio="none" shape-rendering="crispEdges"><g fill="var(--mut)" opacity=".13">${[...SEG].map(rs).join('')}</g><g fill="${col}">${L(m&own)}</g><g fill="${col}" opacity=".5">${L(m&~own)}</g></svg>`};
+let G,$=document.getElementById('app');
+const P=()=>G.players[G.cur];
+const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function resP(c,i,r=c.rot){ // i=-1：開新牌堆。回傳的 m 是「目前玩家視角」的圖形；已有線的位置不可重疊
+ const f=P().flip,cm=em(c,r);let m;
+ if(i<0){if(G.piles.length>=5)return null;m=cm}
+ else{const V=vw(G.piles[i].m,f);if(V&cm)return null;m=V|cm}
+ return{m,pts:D2[m]??0,dig:D2[m]};
+}
+const targets=(c,r=c.rot)=>{const t=[];for(let i=-1;i<G.piles.length;i++)if(resP(c,i,r))t.push(i);return t};
+const stuck=p=>!p.hand.some(c=>[0,1].some(r=>targets(c,r).length));
+function discardSel(){if(G.sel===null||G.phase!=='play'||lock())return;const k=G.sel;G.sel=null;discard(k)}
+function rotSel(){if(G.sel===null)return;const c=P().hand[G.sel];c.rot^=1;render()}
+const FB_CONFIG={ // Firebase 設定（使用 Realtime Database）
+ apiKey:"AIzaSyC1m14JDvWw6RXJaXxB4IITMWHm1kDqMKM",
+ authDomain:"segment-stack.firebaseapp.com",
+ databaseURL:"https://segment-stack-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"segment-stack",
+ storageBucket:"segment-stack.firebasestorage.app",
+ messagingSenderId:"129029825168",
+ appId:"1:129029825168:web:3597a70211f06270a92e15",
+ measurementId:"G-3JXSL16Z4C"
+};
+const S=(()=>{try{return{mus:.6,sfx:.8,...JSON.parse(localStorage.getItem('sc_set'))}}catch(e){return{mus:.6,sfx:.8}}})();
+const sv=()=>{try{localStorage.setItem('sc_set',JSON.stringify(S))}catch(e){}};
+const BG={lobby:new Audio('lobby.mp3'),game:new Audio('game.mp3')};
+Object.values(BG).forEach(a=>{a.loop=true;a.preload='auto'});
+let ME=0,ROOM=null,CODE='',curBg='',AC,shown=false;
+function bgm(k){curBg=k;for(const n in BG){const a=BG[n];a.volume=S.mus;if(n===k){if(a.paused)a.play().catch(()=>{})}else a.pause()}}
+const beep=(f,d=.12,t='square',dl=0)=>{if(!S.sfx)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),t0=AC.currentTime+dl;o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.2*S.sfx,t0);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g).connect(AC.destination);o.start(t0);o.stop(t0+d)}catch(e){}};
+const sfx={place:()=>beep(330,.08),score:()=>[523,659,784].forEach((f,i)=>beep(f,.15,'triangle',i*.09)),draw:()=>beep(440,.06,'sine'),disc:()=>beep(180,.12,'sawtooth'),flip:()=>{beep(250,.1,'sine');beep(380,.1,'sine',.1)},win:()=>[523,659,784,1047].forEach((f,i)=>beep(f,.25,'triangle',i*.14)),click:()=>beep(600,.04,'sine')};
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))sfx.click()});
+const fsOn=()=>document.fullscreenElement||document.webkitFullscreenElement;
+function fs(on){const d=document.documentElement;try{if(on===undefined)on=!fsOn();let r;if(on&&!fsOn())r=(d.requestFullscreen||d.webkitRequestFullscreen).call(d);else if(!on&&fsOn())r=(document.exitFullscreen||document.webkitExitFullscreen).call(document);if(r&&r.catch)r.catch(()=>{})}catch(e){}}
+function modal(h){let d=document.getElementById('md');if(!d){d=document.createElement('div');d.id='md';d.className='ov';d.style.zIndex=20;document.body.appendChild(d)}d.innerHTML=h+'<button class="b g" onclick="document.getElementById(\'md\').remove()">關閉</button>'}
+function settings(){modal(`<h1>設定</h1><label>🎵 音樂 <input type="range" min="0" max="100" value="${S.mus*100}" oninput="S.mus=this.value/100;sv();for(const k in BG)BG[k].volume=S.mus"></label><label>🔔 音效 <input type="range" min="0" max="100" value="${S.sfx*100}" oninput="S.sfx=this.value/100;sv()" onchange="sfx.place()"></label><button class="b" onclick="fs()">⛶ 全螢幕 開／關</button>`)}
+const rulesHTML=()=>`<div class="table" style="text-align:left;line-height:1.8"><b>規則</b><br>每人 5 張手牌（共 22 種紋路、60 張：1 畫 60%、2 畫 30%、3 畫 10%），每張牌放置前都可<b>旋轉 180°</b>（上下左右對調）。每回合<b>必須出 1 張</b>：開一個新牌堆（桌上最多 5 堆），或疊在既有牌堆上。疊牌時<b>已有線的位置不能重疊</b>，只能把有線蓋在無線處，紋路取聯集。<br><b>得分以出牌玩家的視角為準</b>：玩家 1、3 坐▲側，玩家 2、4 坐▼側，兩側看同一堆牌是上下顛倒的，所以我方看到 9，對方看到的就是 6，誰疊出來就用誰看到的數字計分（畫面顯示的是目前玩家的視角）。<br>疊完後若牌堆圖形剛好是 0~9，就得該數字分數（0 不得分）；同一堆繼續疊出新數字可再得分。牌堆疊成 8 就不能再疊，整堆回到抽牌堆並洗牌。<br><b>只要成功出牌就能抽 1 張</b>（組成 0 時多抽 1 張，共 2 張）；<b>丟棄牌則不能抽牌</b>。抽牌時可選<b>抽牌堆</b>或<b>棄牌堆最上面一張</b>；抽牌堆用盡時，棄牌堆會全部洗牌放回抽牌堆。你也可以選擇不出牌、改丟一張到明擺的棄牌堆；若手牌完全無法出，則一定要丟。<br>有人達到目標分數時遊戲結束；選「不限」則要等所有人手牌用完才結束（可能很久）。</div>`;
+function rules(){modal('<div style="max-height:75vh;overflow:auto;max-width:600px">'+rulesHTML()+'</div>')}
+function splash(){G=null;$.className='';$.innerHTML=`<div class="ov" onclick="enter()" style="cursor:pointer"><h1 style="font-size:36px">疊紋拼數</h1><div class="pulse">點擊畫面開始</div></div>`}
+function enter(){fs(true);bgm('lobby');lobby()}
+function lobby(){
+ G=null;ROOM=null;$.className='';bgm('lobby');
+ $.innerHTML=`<div class="menu">
+ <div class="card"><h3>🤖 對戰電腦</h3><label>難度 <select id="lv"><option value="0">簡單</option><option value="1" selected>一般</option><option value="2">困難</option></select></label><label>人數 <select id="n"><option>2</option><option>3</option><option>4</option></select></label><button class="b" onclick="startMode('cpu')">開始</button></div>
+ <div class="card"><h3>👥 單機雙人</h3><small style="color:var(--mut)">輪流出牌，下完後畫面立即翻面</small><button class="b" onclick="startMode('hot')">開始</button></div>
+ <div class="card"><h3>🌐 聯網雙人</h3><input id="rc" type="text" inputmode="numeric" maxlength="4" placeholder="房間代碼" style="width:110px"><button class="b" onclick="join()">加入房間</button><button class="b g" onclick="host()">建立房間</button></div></div>
+ <div class="row" style="justify-content:center"><label>目標分數 <select id="tg"><option value="30" selected>30</option><option value="50">50</option><option value="80">80</option><option value="0">不限</option></select></label><button class="b g" onclick="rules()">規則</button><button class="b g" onclick="settings()">⚙ 設定</button><button class="b g" onclick="fs()">⛶ 全螢幕</button></div>`;
+}
+function newGame(mode){
+ const q=id=>document.getElementById(id),cpu=mode==='cpu',n=cpu?+q('n').value:2;
+ let deck=[];TYPES.forEach(t=>{for(let i=0;i<t.k;i++)deck.push({...t,rot:0})});sh(deck);
+ G={mode,level:cpu?+q('lv').value:0,v:1,players:Array.from({length:n},(_,i)=>({name:cpu&&i?`電腦${i}`:`玩家${i+1}`,cpu:cpu&&i>0,hand:deck.splice(0,5),score:0,flip:i%2})),deck,disc:[],piles:[],cur:0,sel:null,phase:'play',drawLeft:0,turns:0,log:[],over:false,target:+q('tg').value};
+}
+function startMode(m){newGame(m);bgm('game');fs(true);render()}
+const lock=()=>P().cpu||(G.mode==='online'&&G.cur!==ME);
+const back=()=>G&&G.mode==='online'?leave():lobby();
+function quit(){modal('<h1>離開遊戲？</h1><button class="b" onclick="document.getElementById(\'md\').remove();back()">回到大廳</button>')}
+window.alert=m=>modal('<h1>'+m+'</h1>');
+// ===== 聯網（Firebase Realtime Database；整個遊戲狀態以字串同步）=====
+const pack=()=>JSON.stringify({...G,sel:null});
+function sync(){if(G.mode!=='online'||!ROOM)return;G.v++;ROOM.child('st').set(pack())}
+function loadFB(){return new Promise((ok,no)=>{
+ if(!FB_CONFIG.apiKey||!FB_CONFIG.databaseURL){alert('尚未設定 Firebase：請在程式碼最上方的 FB_CONFIG 填入設定');return no()}
+ const L=['app','database'];let i=0;
+ const nx=()=>{if(window.firebase&&firebase.apps&&firebase.apps.length)return ok();if(i===L.length){firebase.initializeApp(FB_CONFIG);return ok()}
+  const e=document.createElement('script');e.src=`https://www.gstatic.com/firebasejs/10.12.2/firebase-${L[i++]}-compat.js`;e.onload=nx;e.onerror=()=>{alert('Firebase 載入失敗');no()};document.head.appendChild(e)};nx()})}
+async function host(){try{await loadFB()}catch(e){return}
+ CODE=String(1000+Math.random()*9000|0);ME=0;shown=false;newGame('online');
+ ROOM=firebase.database().ref('rooms/'+CODE);await ROOM.set({st:pack(),joined:false});listen()}
+async function join(){const c=document.getElementById('rc').value.trim();if(!c)return;try{await loadFB()}catch(e){return}
+ const r=firebase.database().ref('rooms/'+c),d=(await r.once('value')).val();
+ if(!d||d.joined)return alert('找不到房間，或房間已滿');
+ CODE=c;ME=1;shown=false;G=null;ROOM=r;await r.child('joined').set(true);listen()}
+function listen(){ROOM.on('value',s=>{const d=s.val();
+ if(!d){if(ROOM){ROOM=null;alert('房間已關閉');lobby()}return}
+ const st=JSON.parse(d.st);let nw=false;
+ if(!G||st.v>G.v){G=st;G.sel=null;nw=true}
+ if(!d.joined){$.innerHTML=`<div class="table"><div>房間代碼</div><b style="font-size:40px;letter-spacing:6px">${CODE}</b><div>等待對手加入…</div><button class="b g" onclick="leave()">取消</button></div>`;return}
+ if(curBg!=='game')bgm('game');
+ if(nw||!shown){shown=true;if(nw)sfx.place();render()}
+})}
+function leave(){const r=ROOM;ROOM=null;if(r){r.off();if(ME===0)r.remove()}lobby()}
+function render(){
+ if(G.over){const mx=Math.max(...G.players.map(p=>p.score));$.className='';sfx.win();
+  $.innerHTML=`<div class="ov"><h1>遊戲結束</h1>${G.players.map(p=>`<div>${p.name}：<b>${p.score}</b> 分${p.score===mx?' 🏆':''}</div>`).join('')}<button class="b" onclick="back()">再玩一次</button></div>`;return}
+ const p=P(),lk=lock(),play=G.phase==='play',st=play&&!lk&&stuck(p),sc=play&&!lk&&!st&&G.sel!==null?p.hand[G.sel]:null;
+ const fh=G.players.findIndex(q=>!q.cpu),vf=G.mode==='online'?G.players[ME].flip:p.cpu?G.players[fh].flip:p.flip,RF=0,lab=r=>r.dig===0?'抽2':r.dig!==undefined?'+'+r.pts:'＋';
+ let ps=G.piles.map((pl,i)=>{const r=sc&&resP(sc,i),V=vw(pl.m,vf),dg=D2[V],od=D2[rot(V)];
+  return `<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?`onclick="place(${i})"`:''}><div class="pc">${svg(vw(pl.m,vf^RF),dg!==undefined?'var(--acc)':'var(--ink)',vw(pl.last,vf^RF))}</div>${pl.cards.length} 張${dg!==undefined?'・'+dg:''}${od!==undefined&&od!==dg?'<br>對面看：'+od:''}${r?`<b>${lab(r)}</b>`:''}</div>`}).join('');
+ if(G.piles.length<5){const r=sc&&resP(sc,-1);ps+=`<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?'onclick="place(-1)"':''}><div class="pc">${r?'＋新牌堆':'空位'}</div>${r?`<b>${lab(r)}</b>`:''}</div>`}
+ const top=G.disc[G.disc.length-1],dh=G.disc.slice(-9,-1).map(c=>`<div class="mini">${svg(vw(c.m,RF))}</div>`).join('')+(top?`<div class="mini top">${svg(vw(top.m,RF))}</div>`:'');
+ const status=G.phase==='draw'?`${p.name} 可再抽 ${G.drawLeft} 張，請選來源`:lk?(p.cpu?`${p.name} 思考中…`:'等待對手…'):st?'無法出牌：請點一張手牌丟棄到棄牌堆':sc?'點選牌堆（綠框＝可得分），或按「丟棄這張」':'請選一張手牌';
+ $.className='';$.innerHTML=(G.cover?`<div class="ov"><h1>輪到 ${p.name}</h1><button class="b" onclick="G.cover=false;render()">我準備好了</button></div>`:'')+
+ `<div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="b g" onclick="settings()">⚙</button><button class="b g" onclick="quit()">大廳</button></div><div class="row">${G.players.map((q,i)=>`<div class="pl ${i===G.cur?'on':''}">${q.name}${G.mode==='online'&&i===ME?'（你）':''} ${q.flip?'▼':'▲'}<br><b>${q.score}</b> 分・${q.hand.length} 張</div>`).join('')}</div>
+ <div class="table"><div style="color:var(--mut);font-size:13px">目標 ${G.target?G.target+' 分':'不限'}・${p.name} 的回合・${status}</div>
+ <div class="piles${G.fa?' fl':''}">${ps}</div>
+ <div class="row" style="justify-content:center;gap:24px;align-items:flex-start"><div><div class="back"></div><small style="color:var(--mut)">抽牌堆 ${G.deck.length}</small></div>
+ <div><div class="disc">${dh||'<span style="color:var(--mut);font-size:12px">（空）</span>'}</div><small style="color:var(--mut)">棄牌堆（明擺）${G.disc.length}</small></div></div>
+ ${G.phase==='draw'&&!lk?`<div class="row" style="justify-content:center;margin-top:12px"><button class="b" ${G.deck.length?'':'disabled'} onclick="takeDraw('deck')">抽牌堆</button><button class="b" ${top?'':'disabled'} onclick="takeDraw('disc')">拿棄牌堆頂${top?`<span class="mini top" style="width:26px;height:43px">${svg(vw(top.m,RF))}</span>`:''}</button></div>`:''}</div>
+ <div class="hand">${lk?p.hand.map(()=>'<div class="c"></div>').join(''):p.hand.map((c,i)=>`<div class="w" onclick="pick(${i})"><div class="c ${G.sel===i?'sel':''} ${st?'dis':''}">${svg(vw(em(c),RF))}</div><small>${c.n}${c.rot?' ↻':''}</small></div>`).join('')}</div>
+ ${sc?'<div class="row" style="justify-content:center;margin-top:10px"><button class="b" onclick="rotSel()">↻ 旋轉 180°</button><button class="b g" onclick="discardSel()">丟棄這張</button></div>':''}
+ <div id="log">${G.log.slice(-5).reverse().join('<br>')}</div>`;
+}
+function pick(i){
+ if(G.phase!=='play'||lock())return;
+ if(stuck(P()))return discard(i);
+ G.sel=G.sel===i?null:i;render();
+}
+function place(i,ci){
+ const p=P(),k=ci??G.sel,c=p.hand[k],r=resP(c,i);if(!r)return;
+ p.hand.splice(k,1);
+ sfx.place();let pl;if(i<0){pl={cards:[],m:0};G.piles.push(pl)}else pl=G.piles[i];
+ pl.cards.push(c);pl.m=vw(r.m,p.flip);pl.last=vw(em(c),p.flip);G.sel=null;
+ let t=`${p.name} 出「${c.n}」${i<0?'開新牌堆':'疊上牌堆'}`;
+ if(r.dig===undefined){G.log.push(t+'，未組成數字，抽 1 張');G.drawLeft=1;return startDraw()}
+ p.score+=r.pts;if(r.pts)setTimeout(sfx.score,150);t+=`，組成 ${r.dig}（${p.name}的視角），${r.pts?'+'+r.pts+' 分':'不得分'}`;
+ if(r.m===FULL){pl.cards.forEach(x=>x.rot=0);G.deck.push(...pl.cards);G.piles.splice(G.piles.indexOf(pl),1);sh(G.deck);t+='；牌堆滿 8，回收並洗牌'}
+ G.log.push(t);G.drawLeft=r.dig===0?2:1;startDraw();
+}
+function discard(k){
+ const p=P(),c=p.hand.splice(k,1)[0];c.rot=0;sfx.disc();G.disc.push(c);G.log.push(`${p.name} 無法出牌，丟棄「${c.n}」`);advance();
+}
+function startDraw(){
+ if(!G.deck.length&&G.disc.length){G.deck=sh(G.disc.splice(0));G.reshuf=(G.reshuf||0)+1;G.log.push('抽牌堆用盡，棄牌堆全部洗牌放回抽牌堆')}
+ if(G.drawLeft<=0||(!G.deck.length&&!G.disc.length)){return advance()}
+ G.phase='draw';render();sync();
+ {const g0=G;if(P().cpu)setTimeout(()=>G===g0&&cpuDraw(),800)}
+}
+function takeDraw(src){
+ const p=P(),c=src==='deck'?G.deck.pop():G.disc.pop();if(!c)return;
+ c.rot=0;sfx.draw();p.hand.push(c);G.drawLeft--;G.log.push(`${p.name} 從${src==='deck'?'抽牌堆':'棄牌堆'}拿牌`);startDraw();
+}
+function cpuDraw(){
+ const top=G.disc[G.disc.length-1];
+ const want=G.level&&top&&[0,1].some(r=>targets(top,r).some(i=>resP(top,i,r).dig!==undefined));
+ takeDraw(want||!G.deck.length?'disc':'deck');
+}
+function advance(){
+ G.phase='play';G.drawLeft=0;G.turns++;
+ if(!G.players.some(p=>p.hand.length)||G.turns>800||(G.target&&G.players.some(p=>p.score>=G.target))){G.over=true;sync();return render()}
+ do{G.cur=(G.cur+1)%G.players.length}while(!P().hand.length);
+ if(G.mode==='hot'){sfx.flip();G.fa=1}render();G.fa=0;sync();
+ {const g0=G;if(P().cpu)setTimeout(()=>G===g0&&cpu(),900)}
+}
+function cpu(){
+ const L=G.level,h=P().hand;let best=null,bv=-1e9;const cv=h.map(()=>-1e9);
+ h.forEach((c,k)=>[0,1].forEach(rt=>targets(c,rt).forEach(i=>{const r=resP(c,i,rt);
+  const nf=((G.cur+1)%G.players.length)%2^P().flip,om=vw(r.m,nf),tt=TYPES.map(t=>[t.m,rot(t.m)].map(x=>!(x&om)&&D2[x|om]!==undefined?D2[x|om]:-1)),risk=r.m===FULL?0:L>1?tt.reduce((s,a,j)=>s+TYPES[j].k*Math.max(0,...a),0)/20:L?tt.filter(a=>Math.max(...a)>=0).length*.6:0; // 對手下一張能得分的牌種數
+  const v=r.pts*3+(r.dig===undefined?0:r.dig===0?4:1.5)-risk+Math.random()*[12,.5,.15][L];
+  if(v>cv[k])cv[k]=v;if(v>bv){bv=v;best=[i,k,rt]}})));
+ if(best&&(L<1||bv>(L>1?-3:-1.5))){h[best[1]].rot=best[2];place(best[0],best[1])} // 出牌太危險就改丟牌
+ else{let k=0;if(best)h.forEach((c,j)=>{if(cv[j]<cv[k])k=j});else h.forEach((c,j)=>{if(pc(c.m)>pc(h[k].m))k=j});discard(k)}
+}
+splash();
+</script></body></html>
