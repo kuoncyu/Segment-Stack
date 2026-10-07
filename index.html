@@ -3,9 +3,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>疊紋拼數</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4efe6;--fg:#2b2620;--card:#fffdf8;--ink:#c8402f;--mut:#8a7f70;--acc:#2f6f5e;--line:#d8cfbf}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b18;--fg:#efe8da;--card:#2a2723;--ink:#ff7a5f;--mut:#9a9082;--acc:#5fb59d;--line:#433e37}}
-:root[data-theme="dark"]{--bg:#1d1b18;--fg:#efe8da;--card:#2a2723;--ink:#ff7a5f;--mut:#9a9082;--acc:#5fb59d;--line:#433e37}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#0a1b22;--fg:#e4f3ee;--card:#12303a;--ink:#ffb347;--mut:#7ea3aa;--acc:#3df2c8;--line:#2b505b}
+
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans TC","PingFang TC",sans-serif}
 body{max-width:760px;margin:0 auto;padding:12px}
 h1{font-size:20px;margin:4px 0 10px}
@@ -43,8 +42,84 @@ label{display:flex;gap:8px;align-items:center}
 #app{transition:transform .6s}#app.rt{transform:rotate(180deg)}
 .pulse{animation:p 1.4s infinite;color:var(--mut)}@keyframes p{50%{opacity:.25}}
 .fl .pc{animation:fl .6s}@keyframes fl{from{transform:rotate(180deg)}}
-</style></head><body>
-<h1>疊紋拼數</h1>
+
+html{background:radial-gradient(ellipse at 50% -10%,#1a4651 0,var(--bg) 62%) fixed var(--bg)}body{background:transparent;-webkit-tap-highlight-color:transparent;user-select:none}
+h1{font-family:"Chakra Petch","Noto Sans TC",sans-serif;font-weight:700;letter-spacing:.14em;text-align:center;font-size:22px;color:var(--fg)}
+h1.big{font-size:44px;margin:6px 0 0}
+.ov{background:radial-gradient(ellipse at 50% 30%,#1a4651 0,var(--bg) 70%)}
+.sd{width:72px;height:120px;margin-bottom:8px}.sd svg{filter:drop-shadow(0 0 9px var(--acc))}
+.table,.card,.pl,#log{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.14);box-shadow:0 8px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.1);border-radius:16px}
+.table{padding:14px}.card{padding:16px;transition:transform .15s}.card:hover{transform:translateY(-3px)}
+.card h3{font-family:"Chakra Petch","Noto Sans TC",sans-serif;font-size:18px;letter-spacing:.06em}
+.pl.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 0 18px rgba(61,242,200,.28)}
+#log{padding:8px 12px;border-radius:12px}
+.pc,.c,.mini{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 4px 10px rgba(0,0,0,.3);backdrop-filter:blur(2px)}
+.pile .pc{border-radius:10px;border-style:dashed}.pile.t .pc{border-style:solid;border-color:var(--mut);transition:transform .15s}.pile.t:hover .pc{transform:translateY(-4px)}
+.pile.s .pc{border-color:var(--acc);box-shadow:0 0 16px rgba(61,242,200,.45)}
+.pc svg,.c svg,.mini svg{filter:drop-shadow(0 0 3px rgba(255,179,71,.65))}
+.pile.s .pc svg{filter:drop-shadow(0 0 5px rgba(61,242,200,.8))}
+.c{width:72px;height:120px;border-radius:10px}.w:hover .c{transform:translateY(-5px)}
+.c.sel{transform:translateY(-18px);border-color:var(--acc);box-shadow:0 0 18px rgba(61,242,200,.5)}
+.c.dis{border-color:var(--ink)}
+.back{border-radius:8px;border:1px solid rgba(255,255,255,.25)}
+button.b{background:linear-gradient(180deg,#4bf5d1,#1fbf9c);color:#06241d;font-weight:700;border-radius:999px;padding:9px 20px;box-shadow:0 4px 12px rgba(31,191,156,.3);transition:transform .1s,filter .15s}
+button.b:hover:not(:disabled){filter:brightness(1.1)}button.b:active:not(:disabled){transform:scale(.96)}
+button.b.g{background:rgba(255,255,255,.06);color:var(--fg);border:1px solid rgba(255,255,255,.2);box-shadow:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input[type=range]{accent-color:var(--acc);width:200px}
+@media (min-width:600px){.c{width:84px;height:140px}.pile{width:92px}.pile .pc{height:150px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+:root{--pw:clamp(46px,min(16vw,13vh),104px);--cw:clamp(44px,min(12.5vw,11vh),88px)}
+body{max-width:none;padding:6px 8px}body.ing h1.t{display:none}
+.gm{height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.hd{grid-area:hd;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}.hd .stat{flex:1;text-align:center;color:var(--fg);font-weight:700}
+button.b.sm{padding:5px 12px;font-size:13px}
+.zone{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:6px 8px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);opacity:.5;transition:background .4s,opacity .4s,box-shadow .4s}
+.zone.on{opacity:1;background:rgba(61,242,200,.13);border-color:rgba(61,242,200,.45);box-shadow:inset 0 0 28px rgba(61,242,200,.18)}
+.zone.opp{grid-area:opp}.zone.me{grid-area:me;flex-direction:column}.zone.me .hand{padding-top:16px;margin-top:0;gap:6px}
+.pl{flex:0 1 auto;min-width:0;padding:4px 10px}
+.mb{display:inline-block;width:9px;height:15px;margin-left:2px;border-radius:2px;border:1px solid var(--mut);background:repeating-linear-gradient(45deg,var(--line),var(--line) 2px,var(--card) 2px,var(--card) 4px);vertical-align:middle}
+.mid{grid-area:mid;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;gap:6px}
+.mid .piles{margin:0;gap:min(2vw,12px);flex-wrap:nowrap}
+.pile{width:var(--pw);flex:none}.pile .pc{height:calc(var(--pw)*1.67)}
+.c{width:var(--cw);height:calc(var(--cw)*1.67)}
+.aux{display:flex;gap:24px;align-items:flex-end;justify-content:center}
+.back{width:calc(var(--pw)*.6);height:var(--pw)}.back.t{cursor:pointer;box-shadow:0 0 16px var(--acc);border-color:var(--acc)}
+.dz.t .disc{outline:2px dashed var(--acc);outline-offset:3px;border-radius:8px;cursor:pointer}
+.mini{width:calc(var(--pw)*.34);height:calc(var(--pw)*.57)}.mini.top{width:calc(var(--pw)*.6);height:var(--pw)}
+#log{min-height:2.4em;text-align:center}
+@media (orientation:landscape) and (min-width:640px){
+ :root{--pw:clamp(46px,min(11vw,16vh),110px);--cw:clamp(44px,min(5.5vw,10vh),84px)}
+ .gm{display:grid;grid-template-columns:1fr minmax(250px,36%);grid-template-rows:auto auto 1fr;grid-template-areas:"hd hd" "mid opp" "mid me";gap:6px 10px}
+ .zone.me{align-self:stretch}.zone.opp{align-self:start}}
+@media (max-height:430px){#log{display:none}}
+
+.lb{min-height:calc(100dvh - 12px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.modes{display:flex;flex-direction:column;gap:10px;width:min(380px,86vw);margin-top:14px}
+.mode{display:flex;flex-direction:column;align-items:center;gap:3px;padding:16px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.16);color:var(--fg);font:inherit;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.mode b{font-family:"Chakra Petch","Noto Sans TC",sans-serif;font-size:20px;letter-spacing:.12em}.mode small{color:var(--mut)}
+.mode:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 0 22px rgba(61,242,200,.25)}
+.foot{display:flex;gap:20px;margin-top:10px}.lk{background:none;border:0;border-bottom:1px solid transparent;color:var(--mut);font:inherit;padding:8px 4px;cursor:pointer}.lk:hover{color:var(--fg);border-color:var(--acc)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.seg button{background:none;border:0;color:var(--fg);font:inherit;padding:8px 16px;cursor:pointer}.seg button.on{background:var(--acc);color:#06241d;font-weight:700}
+.fld{display:flex;gap:12px;align-items:center;justify-content:space-between;width:min(360px,88vw)}
+.sub{color:var(--mut);max-width:min(440px,88vw);text-align:center;line-height:1.7;margin:0}
+.demo{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:92vw;min-height:80px}
+.dm{width:34px;height:57px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:rgba(255,255,255,.06)}.demo .dm{width:42px;height:70px}
+.dm svg{filter:drop-shadow(0 0 3px rgba(255,179,71,.6))}.dm.t{cursor:pointer;border-color:var(--acc);box-shadow:0 0 14px rgba(61,242,200,.4)}
+.op{font-size:22px;color:var(--mut);padding:0 4px}.msg{width:100%;text-align:center;font-weight:700;color:var(--acc)}
+.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--acc)}
+@media (max-height:520px){.sd{width:36px;height:60px;margin:0}h1.big{font-size:28px}.modes{flex-direction:row;width:min(760px,94vw);margin-top:6px}.mode{flex:1;padding:10px}.lb{gap:4px}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ov{overflow-y:auto;justify-content:safe center}
+.fxp{position:fixed;z-index:30;pointer-events:none;font:700 40px "Chakra Petch","Noto Sans TC",sans-serif;color:var(--acc);text-shadow:0 0 16px var(--acc);transform:translate(-50%,-50%) scale(.3);opacity:0;transition:transform .3s,opacity .25s}.fxp.in{transform:translate(-50%,-50%) scale(1.3);opacity:1}
+.pl b{display:inline-block}.pl b.pop{animation:pop .6s}@keyframes pop{50%{transform:scale(1.7)}}
+#tdm>*{animation:fi .5s}@keyframes fi{from{opacity:0;transform:translateY(10px) scale(.85)}}
+.cap{min-height:1.6em;font-weight:700;text-align:center;max-width:88vw}.lay{position:relative}.lay svg+svg{position:absolute;inset:0}
+.big2{font:700 46px "Chakra Petch",sans-serif;color:var(--acc);text-shadow:0 0 16px var(--acc)}.pl2{padding:8px 18px;border:1px solid var(--acc);border-radius:12px}.pl2 b{display:inline-block;font-size:22px;color:var(--ink)}.pl2 b.pop{animation:pop .7s}
+.rt svg{animation:rt .9s .2s forwards}@keyframes rt{to{transform:rotate(180deg)}}
+</style><meta name="theme-color" content="#0a1b22"><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet"></head><body>
+<h1 class="t">疊紋拼數</h1>
 <div id="app"></div>
 <script>
 const SEG='abcdefg',R={a:[0,0,60,10],f:[0,0,10,50],b:[50,0,10,50],g:[0,45,60,10],e:[0,50,10,50],c:[50,50,10,50],d:[0,90,60,10]};
@@ -61,7 +136,7 @@ const P=()=>G.players[G.cur];
 const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 function resP(c,i,r=c.rot){ // i=-1：開新牌堆。回傳的 m 是「目前玩家視角」的圖形；已有線的位置不可重疊
  const f=P().flip,cm=em(c,r);let m;
- if(i<0){if(G.piles.length>=5)return null;m=cm}
+ if(i<0){if(G.piles.length>=4)return null;m=cm}
  else{const V=vw(G.piles[i].m,f);if(V&cm)return null;m=V|cm}
  return{m,pts:D2[m]??0,dig:D2[m]};
 }
@@ -92,24 +167,68 @@ const fsOn=()=>document.fullscreenElement||document.webkitFullscreenElement;
 function fs(on){const d=document.documentElement;try{if(on===undefined)on=!fsOn();let r;if(on&&!fsOn())r=(d.requestFullscreen||d.webkitRequestFullscreen).call(d);else if(!on&&fsOn())r=(document.exitFullscreen||document.webkitExitFullscreen).call(document);if(r&&r.catch)r.catch(()=>{})}catch(e){}}
 function modal(h){let d=document.getElementById('md');if(!d){d=document.createElement('div');d.id='md';d.className='ov';d.style.zIndex=20;document.body.appendChild(d)}d.innerHTML=h+'<button class="b g" onclick="document.getElementById(\'md\').remove()">關閉</button>'}
 function settings(){modal(`<h1>設定</h1><label>🎵 音樂 <input type="range" min="0" max="100" value="${S.mus*100}" oninput="S.mus=this.value/100;sv();for(const k in BG)BG[k].volume=S.mus"></label><label>🔔 音效 <input type="range" min="0" max="100" value="${S.sfx*100}" oninput="S.sfx=this.value/100;sv()" onchange="sfx.place()"></label><button class="b" onclick="fs()">⛶ 全螢幕 開／關</button>`)}
-const rulesHTML=()=>`<div class="table" style="text-align:left;line-height:1.8"><b>規則</b><br>每人 5 張手牌（共 23 種紋路、120 張：1 畫 30%、2 畫 50%、3 畫 20%）。因為是透明卡牌，放置前可按「變換」<b>旋轉或翻面</b>（上下、左右翻轉都可以）。每回合<b>必須出 1 張</b>：開一個新牌堆（桌上最多 5 堆），或疊在既有牌堆上。疊牌時<b>已有線的位置不能重疊</b>，只能把有線蓋在無線處，紋路取聯集。<br><b>得分以出牌玩家的視角為準</b>：玩家 1、3 坐▲側，玩家 2、4 坐▼側，兩側看同一堆牌是上下顛倒的，所以我方看到 9，對方看到的就是 6，誰疊出來就用誰看到的數字計分（畫面顯示的是目前玩家的視角）。<br>疊完後若牌堆圖形剛好是 0~9，就得該數字分數（0 不得分）；同一堆繼續疊出新數字可再得分。牌堆疊成 8 就不能再疊，整堆回到抽牌堆並洗牌。<br><b>只要成功出牌就能抽 1 張</b>（組成 0 時多抽 1 張，共 2 張）；<b>丟棄牌則不能抽牌</b>。抽牌時可選<b>抽牌堆</b>或<b>棄牌堆最上面一張</b>；抽牌堆用盡時，棄牌堆會全部洗牌放回抽牌堆。你也可以選擇不出牌、改丟一張到明擺的棄牌堆；若手牌完全無法出，則一定要丟。<br>有人達到目標分數時遊戲結束；選「不限」則要等所有人手牌用完才結束（可能很久）。</div>`;
+const rulesHTML=()=>`<div class="table" style="text-align:left;line-height:1.8"><b>規則</b><br>每人 5 張手牌（共 23 種紋路、120 張：1 畫 30%、2 畫 50%、3 畫 20%）。因為是透明卡牌，放置前可按「變換」<b>旋轉或翻面</b>（上下、左右翻轉都可以）。每回合<b>必須出 1 張</b>：開一個新牌堆（桌上最多 4 堆），或疊在既有牌堆上。疊牌時<b>已有線的位置不能重疊</b>，只能把有線蓋在無線處，紋路取聯集。<br><b>得分以出牌玩家的視角為準</b>：玩家 1、3 坐▲側，玩家 2、4 坐▼側，兩側看同一堆牌是上下顛倒的，所以我方看到 9，對方看到的就是 6，誰疊出來就用誰看到的數字計分（畫面顯示的是目前玩家的視角）。<br>疊完後若牌堆圖形剛好是 0~9，就得該數字分數；<b>數字 0</b>（外框六條線亮、中間 g 不亮）不得分，但可以多抽 1 張（共抽 2 張）；同一堆繼續疊出新數字可再得分。牌堆疊成 8 就不能再疊，整堆回到抽牌堆並洗牌。<br><b>只要成功出牌就能抽 1 張</b>（組成 0 時多抽 1 張，共 2 張）；<b>丟棄牌則不能抽牌</b>。抽牌時可選<b>抽牌堆</b>或<b>棄牌堆最上面一張</b>；抽牌堆用盡時，棄牌堆會全部洗牌放回抽牌堆。你也可以選擇不出牌、改丟一張到明擺的棄牌堆；若手牌完全無法出，則一定要丟。<br>有人（雙打對抗為隊伍總分）達到目標分數時遊戲結束；選「不限」則要等所有人手牌用完才結束（可能很久）。</div>`;
 function rules(){modal('<div style="max-height:75vh;overflow:auto;max-width:600px">'+rulesHTML()+'</div>')}
-function splash(){G=null;$.className='';$.innerHTML=`<div class="ov" onclick="enter()" style="cursor:pointer"><h1 style="font-size:36px">疊紋拼數</h1><div class="pulse">點擊畫面開始</div></div>`}
-function enter(){fs(true);bgm('lobby');lobby()}
+function splash(){document.body.classList.remove('ing');G=null;$.className='';$.innerHTML=`<div class="ov" onclick="enter()" style="cursor:pointer"><div id="sd" class="sd"></div><h1 class="big">疊紋拼數</h1><div style="color:var(--mut);letter-spacing:.2em">Segment Stack</div><div class="pulse" style="margin-top:18px">點擊畫面開始</div></div>`;sdRun()}
+function enter(){clearInterval(window.sdT);fs(true);bgm('lobby');lobby()}
+const CFG={lv:1,n:2,tg:30,hu:1,tmap:[0,1,0,1]};
+function seats(){const a=[null,null,null,null];CFG.tmap.slice(0,CFG.hu).forEach((t,k)=>{const d=[t,t+2].find(x=>a[x]===null);if(d!==undefined)a[d]=k+1});return a}
+const tsc=i=>G.team?G.players.filter((q,j)=>j%2===i%2).reduce((a,q)=>a+q.score,0):G.players[i].score;
+const closeMd=()=>{const d=document.getElementById('md');if(d)d.remove()};
+function sdRun(){clearInterval(window.sdT);let d=0;const tk=()=>{const e=document.getElementById('sd');if(!e)return clearInterval(window.sdT);e.innerHTML=svg(M(DIG[d++%10]),'var(--acc)')};setTimeout(tk,0);window.sdT=setInterval(tk,700)}
 function lobby(){
- G=null;ROOM=null;$.className='';bgm('lobby');
- $.innerHTML=`<div class="menu">
- <div class="card"><h3>🤖 對戰電腦</h3><label>難度 <select id="lv"><option value="0">簡單</option><option value="1" selected>一般</option><option value="2">困難</option></select></label><label>人數 <select id="n"><option>2</option><option>3</option><option>4</option></select></label><button class="b" onclick="startMode('cpu')">開始</button></div>
- <div class="card"><h3>👥 單機雙人</h3><small style="color:var(--mut)">輪流出牌，下完後畫面立即翻面</small><button class="b" onclick="startMode('hot')">開始</button></div>
- <div class="card"><h3>🌐 聯網雙人</h3><input id="rc" type="text" inputmode="numeric" maxlength="4" placeholder="房間代碼" style="width:110px"><button class="b" onclick="join()">加入房間</button><button class="b g" onclick="host()">建立房間</button></div></div>
- <div class="row" style="justify-content:center"><label>目標分數 <select id="tg"><option value="30" selected>30</option><option value="50">50</option><option value="80">80</option><option value="0">不限</option></select></label><button class="b g" onclick="rules()">規則</button><button class="b g" onclick="settings()">⚙ 設定</button><button class="b g" onclick="fs()">⛶ 全螢幕</button></div>`;
+ G=null;ROOM=null;$.className='';document.body.classList.remove('ing');bgm('lobby');
+ $.innerHTML=`<div class="lb"><div id="sd" class="sd"></div><h1 class="big">疊紋拼數</h1><div style="color:var(--mut);letter-spacing:.2em">Segment Stack</div>
+ <div class="modes"><button class="mode" onclick="cfgDlg('cpu')"><b>對戰電腦</b><small>簡單・一般・困難</small></button><button class="mode" onclick="cfgDlg('hot')"><b>單機雙人</b><small>同一台裝置輪流</small></button><button class="mode" onclick="cfgDlg('team')"><b>雙打對抗</b><small>2 對 2・隊伍總分</small></button><button class="mode" onclick="cfgDlg('online')"><b>聯網雙人</b><small>房間代碼連線</small></button></div>
+ <div class="foot"><button class="lk" onclick="tut()">新手教學</button><button class="lk" onclick="rules()">規則</button><button class="lk" onclick="settings()">設定</button><button class="lk" onclick="about()">關於</button></div></div>`;
+ sdRun();
+}
+const seg=(k,o,m)=>`<div class="seg">${o.map(([v,t])=>`<button class="${CFG[k]===v?'on':''}" onclick="CFG.${k}=${v};cfgDlg('${m}')">${t}</button>`).join('')}</div>`;
+function cfgDlg(m){
+ const T=m==='team',to=T?[[50,'50'],[80,'80'],[120,'120'],[0,'不限']]:[[30,'30'],[50,'50'],[80,'80'],[0,'不限']];
+ if(!to.some(x=>x[0]===CFG.tg))CFG.tg=T?80:30;
+ const tg=`<div class="fld"><span>${T?'隊伍目標分':'目標分數'}</span>${seg('tg',to,m)}</div>`,segT=j=>`<div class="seg">${[0,1].map(v=>`<button class="${CFG.tmap[j]===v?'on':''}" onclick="CFG.tmap[${j}]=${v};cfgDlg('${m}')">組${v+1}</button>`).join('')}</div>`,bad=m==='team'&&[0,1].some(t=>CFG.tmap.slice(0,CFG.hu).filter(x=>x===t).length>2),lv=`<div class="fld"><span>電腦難度</span>${seg('lv',[[0,'簡單'],[1,'一般'],[2,'困難']],m)}</div>`;
+ modal({cpu:`<h1>對戰電腦</h1>${lv}<div class="fld"><span>人數</span>${seg('n',[[2,'2'],[3,'3'],[4,'4']],m)}</div>${tg}<button class="b" onclick="startMode('cpu')">開始遊戲</button>`,
+ hot:`<h1>單機雙人</h1><p class="sub">輪流出牌，每回合結束後牌堆會翻成對方視角</p>${tg}<button class="b" onclick="startMode('hot')">開始遊戲</button>`,
+ team:`<h1>雙打對抗</h1><p class="sub">2 對 2，以隊伍總分計算。組1 在 ▲ 端、組2 在 ▼ 端；每位真人可自選組別（每組最多 2 位），其餘空位由電腦補上</p><div class="fld"><span>真人數量</span>${seg('hu',[[1,'1'],[2,'2'],[3,'3'],[4,'4']],m)}</div>${Array.from({length:CFG.hu},(_,j)=>`<div class="fld"><span>玩家${j+1} 組別</span>${segT(j)}</div>`).join('')}${bad?'<p class="sub">每組最多 2 位真人，請調整</p>':''}${CFG.hu<4?lv:''}${tg}<button class="b" ${bad?'disabled':''} onclick="startMode('team')">開始遊戲</button>`,
+ online:`<h1>聯網雙人</h1>${tg}<button class="b" onclick="host()">建立房間</button><div class="fld"><input id="rc" type="text" inputmode="numeric" maxlength="4" placeholder="房間代碼" style="width:120px"><button class="b g" onclick="join()">加入房間</button></div>`}[m])
+}
+function about(){modal(`<h1>關於</h1><div class="sub">疊紋拼數　Segment Stack</div><p class="sub">設計製作：郭柏宏<br>版本 20261007</p>`)}
+let TP={rot:0};
+const tpClick=()=>{const o=ors(M('ab'));TP.rot=o[(o.indexOf(TP.rot)+1)%o.length];tut(4)};
+function tAnim(){clearInterval(window.tuT);const F=window.TUA;if(!F)return;let k=0;const p=()=>{const a=document.getElementById('tdm'),c=document.getElementById('tcp');if(!a)return clearInterval(window.tuT);a.innerHTML=F[k][0];c.textContent=F[k][1];k=(k+1)%F.length};p();window.tuT=setInterval(p,1500)}
+function tut(i=0){
+ if(i<4)TP.rot=0;
+ const P0=M('abg'),r=TF[TP.rot](M('ab')),ov=r&P0,ok=!ov&&D2[r|P0]===3,
+  dm=(x,col,own)=>`<div class="dm">${svg(typeof x==='string'?M(x):x,col,own)}</div>`,op=t=>`<span class="op">${t}</span>`;
+ const ovl=(p,c)=>`<div class="dm lay">${svg(M(p)|M(c),'var(--ink)',M(p))}${svg(M(p)&M(c),'#ff5a5a')}</div>`,G1='var(--acc)';
+ const S=[
+ ['認識七段數字','牌堆由 a～g 七個位置組成：上 a、右上 b、右下 c、下 d、左下 e、左上 f、中 g。亮起的線段組合起來，就是數字 0～9。',
+  ['a','ab','abc','abcd','abcde','abcdef','abcdefg'].map((m,k)=>[dm(m,G1),`亮起 ${'abcdefg'[k]}（${'上右上右下下左下左上中'.match(/右上|右下|左下|左上|上|下|中/g)[k]}）`]).concat([[dm('bc',G1),'只亮 b、c → 1'],[dm('abc',G1),'亮 a、b、c → 7'],[dm('abcdg',G1),'亮 a、b、c、d、g → 3']])],
+ ['疊牌','卡牌是透明的，每張只有 1～3 畫。把卡牌疊在牌堆上，線段就會合併。',
+  [[dm('abg'),'牌堆：上、右上、中'],[dm('abg')+op('＋')+dm('cd'),'手牌：右下、下'],[dm(M('abcdg'),'var(--ink)',M('abg')),'把手牌疊上去（淡色是新疊的線）'],[dm('abcdg',G1),'合併成 3！']]],
+ ['不能重疊','牌堆上已經有線的位置，不能再疊上線，只能蓋在空位上。',
+  [[dm('abg')+op('＋')+dm('ab'),'牌堆已有 a、b、g；手牌也有 a、b'],[ovl('abg','ab'),'紅色是重疊的位置'],[ovl('abg','ab')+op('✗'),'有線重疊就不能出，換一張牌或變換方向']]],
+ ['變換','放置前可以旋轉或翻面。選取手牌後，再點同一張牌，就會換下一種樣子。',
+  ORI(M('ab')).map((m,k)=>[dm(m),['原樣','旋轉 180°','左右翻面','上下翻面'][k]+'（再點一下換下一種）'])],
+ ['練習','牌堆有「上、右上、中」三條線。點下面的牌換樣子，疊出數字 3。',dm(P0)+op('＋')+`<div class="dm t" onclick="tpClick()">${svg(r)}</div>`+op('＝')+dm(ov?P0:r|P0,ok?G1:'var(--mut)')+`<div class="msg">${ok?'答對了！':ov?'有線重疊了，再點一下牌':'還不是 3，再點一下牌'}</div>`],
+ ['得分','疊完後牌堆剛好是 0～9，就得到該數字的分數，並從牌堆飛到得分玩家的分數欄。',
+  [[dm('abcdg',G1),'疊成 3'],[`<div class="big2">+3</div>`,'跳出 +3'],[`<div class="pl2">玩家1　<b>0</b> 分</div>`,'飛到玩家的分數欄'],[`<div class="pl2">玩家1　<b class="pop">3</b> 分</div>`,'分數增加為 3']]],
+ ['視角','數字以出牌玩家的視角計算。6 和 9 上下顛倒，坐在對面的人看到的是另一個數字。',
+  [[dm(DIG[6],G1),'你這端看到 6'],[`<div class="dm rt">${svg(M(DIG[6]),G1)}</div>`,'牌堆轉到對面…'],[dm(DIG[9],G1),'對面看到 9：誰出牌，就用誰看到的數字計分']]],
+ ['數字 0','排出 0 無法得分，但可以多抽 1 張手牌（一共抽 2 張）。',dm(DIG[0],G1)+`<div class="msg">無法得分，多抽 1 張手牌</div>`],
+ ['抽牌與棄牌','成功出牌後可抽 1 張。不想出牌時，可以把手牌丟到棄牌堆。',
+  [[dm('ab')+op('→')+dm('abg'),'成功出牌：疊上牌堆'],[`<div class="back"></div>`+op('→')+dm('ac'),'抽 1 張：抽牌堆，或棄牌堆最上面一張'],[dm('ac')+op('→')+`<div class="dm" style="display:grid;place-items:center;font-size:11px;border-style:dashed">棄牌堆</div>`,'不想出牌：選牌再點棄牌堆（丟棄不能抽牌）'],[dm('abcdefg',G1),'牌堆疊成 8：整堆回收並洗牌']]],
+ ['開始對戰','先達到目標分數的玩家獲勝。準備好了，就回到大廳開始吧！','']];
+ const [t,x,d]=S[i],an=Array.isArray(d);window.TUA=an?d:null;setTimeout(tAnim,0);
+ modal(`<h1>${t}</h1><div class="dots">${S.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><div class="demo" id="tdm">${an?'':d}</div><div class="cap" id="tcp"></div><p class="sub">${x}</p><div class="row"><button class="b g" ${i?'':'disabled'} onclick="tut(${i-1})">上一步</button>${i<S.length-1?`<button class="b" onclick="tut(${i+1})">下一步</button>`:`<button class="b" onclick="closeMd()">完成</button>`}</div>`)
 }
 function newGame(mode){
- const q=id=>document.getElementById(id),cpu=mode==='cpu',n=cpu?+q('n').value:2;
+ const cpu=mode==='cpu'||(mode==='team'&&CFG.hu<4),sh2=mode==='team'?seats():[],isC=i=>mode==='team'?!sh2[i]:cpu&&i>0,n=mode==='team'?4:mode==='cpu'?CFG.n:2;
  let deck=[];TYPES.forEach(t=>{for(let i=0;i<t.k;i++)deck.push({...t,rot:0})});sh(deck);
- G={mode,level:cpu?+q('lv').value:0,v:1,players:Array.from({length:n},(_,i)=>({name:cpu&&i?`電腦${i}`:`玩家${i+1}`,cpu:cpu&&i>0,hand:deck.splice(0,5),score:0,flip:i%2})),deck,disc:[],piles:[],cur:0,sel:null,phase:'play',drawLeft:0,turns:0,log:[],over:false,target:+q('tg').value};
+ G={mode,gid:Math.random(),team:mode==='team',hs:mode==='hot'||(mode==='team'&&CFG.hu>1),level:cpu?CFG.lv:0,v:1,players:Array.from({length:n},(_,i)=>({name:isC(i)?(mode==='team'?`電腦${i+1}`:`電腦${i}`):(mode==='team'?`玩家${sh2[i]}`:`玩家${i+1}`),cpu:isC(i),hand:deck.splice(0,5),score:0,flip:i%2})),deck,disc:[],piles:[],cur:0,sel:null,phase:'play',drawLeft:0,turns:0,log:[],over:false,target:CFG.tg};G.lastH=G.players.findIndex(p=>!p.cpu);
 }
-function startMode(m){newGame(m);bgm('game');fs(true);render()}
+function startMode(m){closeMd();clearInterval(window.sdT);newGame(m);bgm('game');fs(true);render()}
 const lock=()=>P().cpu||(G.mode==='online'&&G.cur!==ME);
 const back=()=>G&&G.mode==='online'?leave():lobby();
 function quit(){modal('<h1>離開遊戲？</h1><button class="b" onclick="document.getElementById(\'md\').remove();back()">回到大廳</button>')}
@@ -122,10 +241,10 @@ function loadFB(){return new Promise((ok,no)=>{
  const L=['app','database'];let i=0;
  const nx=()=>{if(window.firebase&&firebase.apps&&firebase.apps.length)return ok();if(i===L.length){firebase.initializeApp(FB_CONFIG);return ok()}
   const e=document.createElement('script');e.src=`https://www.gstatic.com/firebasejs/10.12.2/firebase-${L[i++]}-compat.js`;e.onload=nx;e.onerror=()=>{alert('Firebase 載入失敗');no()};document.head.appendChild(e)};nx()})}
-async function host(){try{await loadFB()}catch(e){return}
+async function host(){try{await loadFB()}catch(e){return}closeMd();
  CODE=String(1000+Math.random()*9000|0);ME=0;shown=false;newGame('online');
  ROOM=firebase.database().ref('rooms/'+CODE);await ROOM.set({st:pack(),joined:false});listen()}
-async function join(){const c=document.getElementById('rc').value.trim();if(!c)return;try{await loadFB()}catch(e){return}
+async function join(){const c=document.getElementById('rc').value.trim();if(!c)return;try{await loadFB()}catch(e){return}closeMd();
  const r=firebase.database().ref('rooms/'+c),d=(await r.once('value')).val();
  if(!d||d.joined)return alert('找不到房間，或房間已滿');
  CODE=c;ME=1;shown=false;G=null;ROOM=r;await r.child('joined').set(true);listen()}
@@ -138,31 +257,46 @@ function listen(){ROOM.on('value',s=>{const d=s.val();
  if(nw||!shown){shown=true;if(nw)sfx.place();render()}
 })}
 function leave(){const r=ROOM;ROOM=null;if(r){r.off();if(ME===0)r.remove()}lobby()}
+let DS=[],DSid=null,fxC=Promise.resolve(),fxSeen=0;
+const tds=i=>G.players.reduce((a,q,j)=>a+(j%2===i%2?(DS[j]??q.score):0),0);
+const wait=ms=>new Promise(r=>setTimeout(r,ms)),ctr=e=>{if(!e)return null;const r=e.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]};
+function bump(p,from,to){return new Promise(res=>{const t0=performance.now(),tick=()=>{const k=Math.min(1,(performance.now()-t0)/600),e=document.querySelector(`[data-p="${p}"] b`);if(e){e.textContent=Math.round(from+(to-from)*k);e.classList.add('pop')}if(k<1)requestAnimationFrame(tick);else{DS[p]=to;if(G&&G.players&&document.body.classList.contains('ing')&&!G.over)render();res()}};tick()})}
+function enqueueFx(ev){
+ const el=ev.full?document.querySelector('.mid .piles'):document.querySelectorAll('.pile')[ev.pi],a=ctr(el)||[innerWidth/2,innerHeight/2];
+ fxC=fxC.then(async()=>{
+  const d=document.createElement('div');d.className='fxp';d.textContent='+'+ev.pts;d.style.left=a[0]+'px';d.style.top=a[1]+'px';document.body.appendChild(d);
+  await wait(30);d.classList.add('in');await wait(1000);
+  const t=ctr(document.querySelector(`[data-p="${ev.p}"]`))||a;
+  d.style.transition='transform .7s cubic-bezier(.5,0,.2,1),opacity .25s';d.style.transform=`translate(calc(-50% + ${t[0]-a[0]}px),calc(-50% + ${t[1]-a[1]}px)) scale(.55)`;
+  await wait(700);d.style.opacity=0;if(ev.pts)sfx.score();await wait(200);d.remove();
+  await bump(ev.p,ev.pre,ev.pre+ev.pts)})}
 function render(){
- if(G.over){const mx=Math.max(...G.players.map(p=>p.score));$.className='';sfx.win();
-  $.innerHTML=`<div class="ov"><h1>遊戲結束</h1>${G.players.map(p=>`<div>${p.name}：<b>${p.score}</b> 分${p.score===mx?' 🏆':''}</div>`).join('')}<button class="b" onclick="back()">再玩一次</button></div>`;return}
- const p=P(),lk=lock(),play=G.phase==='play',st=play&&!lk&&stuck(p),sc=play&&!lk&&!st&&G.sel!==null?p.hand[G.sel]:null;
- const fh=G.players.findIndex(q=>!q.cpu),vf=G.mode==='online'?G.players[ME].flip:p.cpu?G.players[fh].flip:p.flip,RF=0,lab=r=>r.dig===0?'抽2':r.dig!==undefined?'+'+r.pts:'＋';
+ const B=document.body.classList;
+ if(G.over){B.remove('ing');const L=G.team?[0,1].map(t=>({n:`組${t+1}（${G.players.filter((q,j)=>j%2===t).map(q=>q.name).join('＋')}）`,s:tsc(t)})):G.players.map(q=>({n:q.name,s:q.score})),mx=Math.max(...L.map(x=>x.s));$.className='';sfx.win();
+  $.innerHTML=`<div class="ov"><h1>遊戲結束</h1>${L.map(p=>`<div>${p.n}：<b>${p.s}</b> 分${p.s===mx?' 🏆':''}</div>`).join('')}<button class="b" onclick="back()">再玩一次</button></div>`;return}
+ B.add('ing');$.className='';if(DSid!==G.gid){DSid=G.gid;DS=G.players.map(q=>q.score);fxSeen=G.ev?G.ev.id:0}
+ const p=P(),lk=lock(),play=G.phase==='play',fh=G.players.findIndex(q=>!q.cpu),vi=G.mode==='online'?ME:G.hs?(p.cpu?G.lastH:(G.lastH=G.cur)):fh,hp=G.players[vi],mine=G.cur===vi,
+  st=play&&!lk&&stuck(p),sc=play&&!lk&&!st&&G.sel!==null?p.hand[G.sel]:null,vf=hp.flip,canD=G.phase==='draw'&&!lk,
+  lab=r=>r.dig===0?'抽2':r.dig!==undefined?'+'+r.pts:'＋';
  let ps=G.piles.map((pl,i)=>{const r=sc&&resP(sc,i),V=vw(pl.m,vf),dg=D2[V],od=D2[rot(V)];
-  return `<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?`onclick="place(${i})"`:''}><div class="pc">${svg(vw(pl.m,vf^RF),dg!==undefined?'var(--acc)':'var(--ink)',vw(pl.last,vf^RF))}</div>${pl.cards.length} 張${dg!==undefined?'・'+dg:''}${od!==undefined&&od!==dg?'<br>對面看：'+od:''}${r?`<b>${lab(r)}</b>`:''}</div>`}).join('');
- if(G.piles.length<5){const r=sc&&resP(sc,-1);ps+=`<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?'onclick="place(-1)"':''}><div class="pc">${r?'＋新牌堆':'空位'}</div>${r?`<b>${lab(r)}</b>`:''}</div>`}
- const top=G.disc[G.disc.length-1],dh=G.disc.slice(-9,-1).map(c=>`<div class="mini">${svg(vw(c.m,RF))}</div>`).join('')+(top?`<div class="mini top">${svg(vw(top.m,RF))}</div>`:'');
- const status=G.phase==='draw'?`${p.name} 可再抽 ${G.drawLeft} 張，請選來源`:lk?(p.cpu?`${p.name} 思考中…`:'等待對手…'):st?'無法出牌：請點一張手牌丟棄到棄牌堆':sc?'點選牌堆（綠框＝可得分），或按「丟棄這張」':'請選一張手牌';
- $.className='';$.innerHTML=(G.cover?`<div class="ov"><h1>輪到 ${p.name}</h1><button class="b" onclick="G.cover=false;render()">我準備好了</button></div>`:'')+
- `<div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="b g" onclick="settings()">⚙</button><button class="b g" onclick="quit()">大廳</button></div><div class="row">${G.players.map((q,i)=>`<div class="pl ${i===G.cur?'on':''}">${q.name}${G.mode==='online'&&i===ME?'（你）':''} ${q.flip?'▼':'▲'}<br><b>${q.score}</b> 分・${q.hand.length} 張</div>`).join('')}</div>
- <div class="table"><div style="color:var(--mut);font-size:13px">目標 ${G.target?G.target+' 分':'不限'}・${p.name} 的回合・${status}</div>
- <div class="piles${G.fa?' fl':''}">${ps}</div>
- <div class="row" style="justify-content:center;gap:24px;align-items:flex-start"><div><div class="back"></div><small style="color:var(--mut)">抽牌堆 ${G.deck.length}</small></div>
- <div><div class="disc">${dh||'<span style="color:var(--mut);font-size:12px">（空）</span>'}</div><small style="color:var(--mut)">棄牌堆（明擺）${G.disc.length}</small></div></div>
- ${G.phase==='draw'&&!lk?`<div class="row" style="justify-content:center;margin-top:12px"><button class="b" ${G.deck.length?'':'disabled'} onclick="takeDraw('deck')">抽牌堆</button><button class="b" ${top?'':'disabled'} onclick="takeDraw('disc')">拿棄牌堆頂${top?`<span class="mini top" style="width:26px;height:43px">${svg(vw(top.m,RF))}</span>`:''}</button></div>`:''}</div>
- <div class="hand">${lk?p.hand.map(()=>'<div class="c"></div>').join(''):p.hand.map((c,i)=>`<div class="w" onclick="pick(${i})"><div class="c ${G.sel===i?'sel':''} ${st?'dis':''}">${svg(vw(em(c),RF))}</div><small>${c.n}${c.rot?' ↻':''}</small></div>`).join('')}</div>
- ${sc?'<div class="row" style="justify-content:center;margin-top:10px"><button class="b" onclick="rotSel()"'+(ors(sc.m).length>1?'':' disabled')+'>變換</button><button class="b g" onclick="discardSel()">丟棄這張</button></div>':''}
- <div id="log">${G.log.slice(-5).reverse().join('<br>')}</div>`;
+  return `<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?`onclick="place(${i})"`:''}><div class="pc">${svg(V,dg!==undefined?'var(--acc)':'var(--ink)',vw(pl.last,vf))}</div>${pl.cards.length} 張${dg!==undefined?'・'+dg:''}${od!==undefined&&od!==dg?'<br>對面看：'+od:''}${r?`<b>${lab(r)}</b>`:''}</div>`}).join('');
+ if(G.piles.length<4){const r=sc&&resP(sc,-1);ps+=`<div class="pile ${r?'t '+(r.dig!==undefined?'s':''):''}" ${r?'onclick="place(-1)"':''}><div class="pc">${r?'＋新牌堆':'空位'}</div>${r?`<b>${lab(r)}</b>`:''}</div>`}
+ const top=G.disc[G.disc.length-1],dh=G.disc.slice(-6,-1).map(c=>`<div class="mini">${svg(c.m)}</div>`).join('')+(top?`<div class="mini top">${svg(top.m)}</div>`:''),dz=(canD&&top)||sc,dk=canD&&G.deck.length;
+ const aux=`<div class="aux"><div style="text-align:center"><div class="back ${dk?'t':''}" ${dk?`onclick="takeDraw('deck')"`:''}></div><small>抽牌堆 ${G.deck.length}</small></div><div class="dz ${dz?'t':''}" ${dz?'onclick="dzClick()"':''} style="text-align:center"><div class="disc">${dh||'<span style="color:var(--mut);font-size:12px">（空）</span>'}</div><small>棄牌堆 ${G.disc.length}</small></div></div>`;
+ const status=(G.hs?p.name+'：':'')+(G.phase==='draw'?(lk?`${p.name} 抽牌中…`:`點抽牌堆或棄牌堆頂抽牌（還可抽 ${G.drawLeft} 張）`):lk?(p.cpu?`${p.name} 思考中…`:`等待 ${p.name}…`):st?'無法出牌：點一張手牌丟棄':sc?'點牌堆出牌・再點手牌變換・點棄牌堆丟棄':'選一張手牌');
+ const chip=(q,i)=>`<div class="pl ${i===G.cur?'on':''}" data-p="${i}">${q.name}${G.mode==='online'&&i===ME?'（你）':''} ${q.flip?'▼':'▲'} <b>${DS[i]??q.score}</b> 分${i===vi?'':`<span class="mbs">${'<i class="mb"></i>'.repeat(q.hand.length)}</span>`}</div>`,idx=G.players.map((q,i)=>i),ops=idx.filter(i=>G.players[i].flip!==hp.flip),mates=idx.filter(i=>i!==vi&&G.players[i].flip===hp.flip);
+ const hand=hp.hand.map((c,i)=>`<div class="w" onclick="pick(${i})"><div class="c ${mine&&G.sel===i?'sel':''} ${st&&mine?'dis':''}">${svg(em(c))}</div><small>${c.n}${c.rot?' ↻':''}</small></div>`).join('');
+ $.innerHTML=`<div class="gm"><div class="hd"><span>${G.team?`組${vi%2+1} ${tds(vi)}：${tds(vi+1)} 組${(vi+1)%2+1}・`:''}目標 ${G.target?G.target+' 分':'不限'}</span><span class="stat">${status}</span><span><button class="b g sm" onclick="settings()">⚙</button> <button class="b g sm" onclick="quit()">大廳</button></span></div>
+ <div class="zone opp ${ops.includes(G.cur)?'on':''}">${ops.map(i=>chip(G.players[i],i)).join('')}</div>
+ <div class="mid" onclick="if(G.sel!==null&&G.phase==='play'){G.sel=null;render()}"><div class="piles">${ps}</div>${aux}<div id="log">${G.log.slice(-2).reverse().join('<br>')}</div></div>
+ <div class="zone me ${ops.includes(G.cur)?'':'on'}"><div class="chips">${idx.filter(i=>i===vi||mates.includes(i)).map(i=>chip(G.players[i],i)).join('')}</div><div class="hand">${hand}</div></div></div>`;
+ if(G.ev&&G.ev.id>fxSeen){fxSeen=G.ev.id;enqueueFx(G.ev)}
 }
+function dzClick(){if(G.phase==='draw')takeDraw('disc');else discardSel()}
 function pick(i){
  if(G.phase!=='play'||lock())return;
  if(stuck(P()))return discard(i);
- G.sel=G.sel===i?null:i;render();
+ if(G.sel===i)return rotSel();G.sel=i;render();
 }
 function place(i,ci){
  const p=P(),k=ci??G.sel,c=p.hand[k],r=resP(c,i);if(!r)return;
@@ -171,7 +305,7 @@ function place(i,ci){
  pl.cards.push(c);pl.m=vw(r.m,p.flip);pl.last=vw(em(c),p.flip);G.sel=null;
  let t=`${p.name} 出「${c.n}」${i<0?'開新牌堆':'疊上牌堆'}`;
  if(r.dig===undefined){G.log.push(t+'，未組成數字，抽 1 張');G.drawLeft=1;return startDraw()}
- p.score+=r.pts;if(r.pts)setTimeout(sfx.score,150);t+=`，組成 ${r.dig}（${p.name}的視角），${r.pts?'+'+r.pts+' 分':'不得分'}`;
+ p.score+=r.pts;G.ev={id:(G.evn=(G.evn||0)+1),p:G.cur,pi:G.piles.indexOf(pl),pts:r.pts,pre:p.score-r.pts,full:r.m===FULL?1:0};t+=`，組成 ${r.dig}（${p.name}的視角），${r.pts?'+'+r.pts+' 分':'不得分'}`;
  if(r.m===FULL){pl.cards.forEach(x=>x.rot=0);G.deck.push(...pl.cards);G.piles.splice(G.piles.indexOf(pl),1);sh(G.deck);t+='；牌堆滿 8，回收並洗牌'}
  G.log.push(t);G.drawLeft=r.dig===0?2:1;startDraw();
 }
@@ -195,9 +329,9 @@ function cpuDraw(){
 }
 function advance(){
  G.phase='play';G.drawLeft=0;G.turns++;
- if(!G.players.some(p=>p.hand.length)||G.turns>800||(G.target&&G.players.some(p=>p.score>=G.target))){G.over=true;sync();return render()}
+ if(!G.players.some(p=>p.hand.length)||G.turns>800||(G.target&&G.players.some((p,i)=>tsc(i)>=G.target))){G.over=true;sync();return render()}
  do{G.cur=(G.cur+1)%G.players.length}while(!P().hand.length);
- if(G.mode==='hot'){sfx.flip();G.fa=1}render();G.fa=0;sync();
+ if(G.hs){sfx.flip();G.fa=1}render();G.fa=0;sync();
  {const g0=G;if(P().cpu)setTimeout(()=>G===g0&&cpu(),900)}
 }
 function cpu(){
